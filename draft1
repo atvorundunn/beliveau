@@ -1,0 +1,19 @@
+# all the things you need to import
+import numpy as np
+import h5py
+
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.datasets.samples_generator import make_blobs
+from sklearn.preprocessing import StandardScaler
+
+# getting access to hdf5 file. reader view only
+filename = 'geo_test1.hdf5'
+f = h5py.File(filename, 'r')
+
+# initializing dbscan, fit to data and create clusters
+db = DBSCAN(eps=65, min_samples=.0001)
+data = db.fit(f) # how do I fit to hdf5 file?
+core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
+labels = db.labels_
