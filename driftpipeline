@@ -1,23 +1,43 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 26 18:13:54 2019
+
+@author: alisa
+"""
 import numpy as np
 import h5py
+import pandas as pd
 
 from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 
-# getting access to hdf5 file, reader view
-filename = 'geo_test2.hdf5'
-f = h5py.File(filename, 'r+')
-group_key = list(f.keys())[0]
-data = list(f[group_key]) #put data from file into seperate list to fit
+with h5py.File('Downloads/geo_test4.hdf5', 'r') as data:
+    ls = list(data.keys())    
+    locs = data.get('locs')
+    x = locs['x']
+    y = locs['y']
+    frames = locs['frame']
+    photons = locs['photons']
+    sx = locs['sx']
+    sy = locs['sy']
+    bg = locs['bg']
+    lpx = locs['lpx']
+    lpy = locs['lpy']
+    ellipticity = locs['ellipticity']
+    net_gradient = locs['net_gradient']
+    z = locs['z']
+    d_zcalib = locs['d_zcalib']
+    
+    
+    xy = np.vstack((frames,x,y)).T
+
+
+    #print(dataset)
 
 # initializing dbscan, fit to data and create clusters
-db = DBSCAN(eps=65, min_samples=.0001)
-data = db.fit(data) #fit data from hdf5 file
+db = DBSCAN(eps=65, min_samples=.001).fit(xy) #fit data from hdf5 file
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
-
-#close file
-f.close()
