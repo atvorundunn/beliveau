@@ -31,7 +31,7 @@ with h5py.File('Downloads/geo_test4.hdf5', 'r') as data:
     d_zcalib = locs['d_zcalib']
     
     
-    xy = np.vstack((frames,x,y)).T
+    xy = np.vstack((x,y)).T
 
 
     #print(dataset)
@@ -41,3 +41,5 @@ db = DBSCAN(eps=65, min_samples=.001).fit(xy) #fit data from hdf5 file
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
+
+#f = np.fft.fft(labels)
