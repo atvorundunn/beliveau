@@ -13,25 +13,27 @@ from sklearn import metrics
 from sklearn.datasets.samples_generator import make_blobs
 from sklearn.preprocessing import StandardScaler
 
-with h5py.File('Downloads/geo_test4.hdf5', 'r') as data:
+with h5py.File('Downloads/chr8-1_018_locs_render_arender.hdf5', 'r') as data:
     ls = list(data.keys())    
     locs = data.get('locs')
     x = locs['x']
+    x = x[:6000]
     y = locs['y']
+    y = y[:6000]
     frames = locs['frame']
-    photons = locs['photons']
-    sx = locs['sx']
-    sy = locs['sy']
-    bg = locs['bg']
-    lpx = locs['lpx']
-    lpy = locs['lpy']
-    ellipticity = locs['ellipticity']
-    net_gradient = locs['net_gradient']
-    z = locs['z']
-    d_zcalib = locs['d_zcalib']
+    #photons = locs['photons']
+    #sx = locs['sx']
+    #sy = locs['sy']
+    #bg = locs['bg']
+    #lpx = locs['lpx']
+    #lpy = locs['lpy']
+    #ellipticity = locs['ellipticity']
+    #net_gradient = locs['net_gradient']
+    #z = locs['z']
+    #d_zcalib = locs['d_zcalib']
     
     
-    xy = np.vstack((x,y)).T
+    xy = np.vstack((x, y)).T
 
 
     #print(dataset)
@@ -41,5 +43,13 @@ db = DBSCAN(eps=65, min_samples=.001).fit(xy) #fit data from hdf5 file
 core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
+
+pointdict = {}
+
+for i in labels:
+    if labels[i] in pointdict:
+        pointdict[labels[i]].append(xy[i])
+    else:
+        pointdict[labels[i]] = xy[i]
 
 #f = np.fft.fft(labels)
