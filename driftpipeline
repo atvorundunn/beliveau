@@ -6,57 +6,62 @@ Created on Tue Feb 26 18:13:54 2019
 """
 import numpy as np
 import h5py
-import pandas as pd
 
 from sklearn.cluster import DBSCAN
-from sklearn import metrics
-from sklearn.datasets.samples_generator import make_blobs
-from sklearn.preprocessing import StandardScaler
 
-with h5py.File('/Users/tvorua/Downloads/chr8-1_018_locs_render_arender.hdf5', 'r') as data:
-    ls = list(data.keys())    
-    locs = data.get('locs')
-    x = locs['x'] #spcial x coordinates
-    x = x[:6000]
-    y = locs['y'] #spacial y coordiantes
-    y = y[:6000]
-    frames = locs['frame'] #temporal data
-    #photons = locs['photons']
-    #sx = locs['sx']
-    #sy = locs['sy']
-    #bg = locs['bg']
-    #lpx = locs['lpx']
-    #lpy = locs['lpy']
-    #ellipticity = locs['ellipticity']
-    #net_gradient = locs['net_gradient']
-    #z = locs['z']
-    #d_zcalib = locs['d_zcalib']
+
+with h5py.File('Downloads/geo_test1.hdf5', 'r') as data:
+    ks = list(data.keys())    
+    locs = data.get(ks[0])
+    x = locs['x']
+   # x = x[:6000]
+    y = locs['y']
+    #y = y[:6000]
+    frames = locs['frame']
+    #frames = frames[:6000]
     
     
-    xy = np.vstack((x, y)).T
+    xy = np.vstack((x, frames)).T
+    
 
 
 # initializing dbscan, fit to data and create clusters
 db = DBSCAN(eps=65, min_samples=.001).fit(xy) #fit data from hdf5 file
-
+core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
 
-print(list(zip(labels, xy))
-
-
-
-#f = np.fft.fft(labels)
-        
-        
-    #photons = locs['photons']
-    #sx = locs['sx']
-    #sy = locs['sy']
-    #bg = locs['bg']
-    #lpx = locs['lpx']
-    #lpy = locs['lpy']
-    #ellipticity = locs['ellipticity']
-    #net_gradient = locs['net_gradient']
-    #z = locs['z']
-    #d_zcalib = locs['d_zcalib']
+#create dictionary of cluster labels and their corresponding points
+#pointdict = {}
+#
+#for i in range(0, 6000, 1):
+#    if labels[i] in pointdict.keys():
+#        pointdict[labels[i]] = np.append(pointdict.get(labels[i]), xy[i])
+#    else:
+#        pointdict[labels[i]] = xy[i]
+#
+##Creat fft from clustered points to clasify as noise or otherwise
+for key in pointdict:
+    fo = np.fft.fft(pointdict.get(key))
+#    
+#    
     
 
+
+    
+#Plot Fourier Transform... somehow
+    
+#   photons = locs['photons']
+#    #photons = photons[:6000]
+#    sx = locs['sx']
+#    #sx = sx[:6000]
+#    sy = locs['sy']
+#    #sy = sy[:6000]
+#    bg = locs['bg']
+#    #bg = bg 
+#    lpx = locs['lpx']
+#    lpy = locs['lpy']
+#    ellipticity = locs['ellipticity']
+#    net_gradient = locs['net_gradient']
+#    z = locs['z']
+#    d_zcalib = locs['d_zcalib']
