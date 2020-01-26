@@ -14,7 +14,7 @@ with h5py.File('Downloads/geo_test1.hdf5', 'r') as data:
     ks = list(data.keys())    
     locs = data.get(ks[0])
     x = locs['x']
-   # x = x[:6000]
+    #x = x[:6000]
     y = locs['y']
     #y = y[:6000]
     frames = locs['frame']
@@ -31,26 +31,25 @@ core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
 core_samples_mask[db.core_sample_indices_] = True
 labels = db.labels_
 
-#create dictionary of cluster labels and their corresponding points
-#pointdict = {}
-#
-#for i in range(0, 6000, 1):
-#    if labels[i] in pointdict.keys():
-#        pointdict[labels[i]] = np.append(pointdict.get(labels[i]), xy[i])
-#    else:
-#        pointdict[labels[i]] = xy[i]
-#
-##Creat fft from clustered points to clasify as noise or otherwise
+create dictionary of cluster labels and their corresponding points
+pointdict = {}
+
+for i in range(0, 6000, 1):
+    if labels[i] in pointdict.keys():
+        pointdict[labels[i]] = np.append(pointdict.get(labels[i]), xy[i])
+    else:
+        pointdict[labels[i]] = xy[i]
+
+#Creat fft from clustered points to clasify as noise or otherwise
 for key in pointdict:
     fo = np.fft.fft(pointdict.get(key))
-#    
-#    
+    
+    
     
 
 
     
-#Plot Fourier Transform... somehow
-    
+
 #   photons = locs['photons']
 #    #photons = photons[:6000]
 #    sx = locs['sx']
