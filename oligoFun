@@ -9,19 +9,37 @@ Created on Wed Jan 22 10:17:22 2020
 import allel
 import numpy as np
 
-
-#with open( '/Users/tvorua/Downloads/hg38.hybrid.vcf', mode ='r' ) as vcf:
-    #dat = vcf.keys()
-    #print(dat)
-
+#parse data
 dat = allel.read_vcf('/Users/tvorua/Downloads/hg38.hybrid.vcf')
-refer = dat[ 'variants/REF' ]
-alter = dat[ 'variants/ALT' ]
-a = 0
-for i in refer:
-    if len(i) != 1 or len(alter[a]) != 1:
-        np.delete(refer, a)
-        np.delete(alter, a)
-    a = a+1
-print(refer.size)
+position = dat['variants/POS']
+position = position[:20000]
+
+reference = dat['variants/REF']
+reference = reference[:20000]
+
+alternate = dat['variants/ALT']
+alternate = alternate[:20000]
+
+posrefalt = np.array([position, reference, alternate[0]])
+
+seen = [0]
+duplicates = [0]
+
+#find duplicate positions
+for i in position:
+    if i in seen:
+        duplicates.append(i)
+    
+    seen.append(i)
+
+
+#delete multiple-base-pair references
+for i in posrefalt:
+    for x in range(posrefalt.size):
+        if len(posrefalt[1][x]) != 1 or len(posrefalt[2][x]) != 1:
+            #delte the column
+        
+
+        
+        
         
