@@ -9,37 +9,46 @@ Created on Wed Jan 22 10:17:22 2020
 import allel
 import numpy as np
 
-#parse data
+
 dat = allel.read_vcf('/Users/tvorua/Downloads/hg38.hybrid.vcf')
-position = dat['variants/POS']
-position = position[:20000]
 
-reference = dat['variants/REF']
-reference = reference[:20000]
 
-alternate = dat['variants/ALT']
-alternate = alternate[:20000]
+chromX = {'POS' : dat['variants/POS'][4120212:], 'REF' : dat['variants/REF'][4120212:],
+          'ALT' : dat['variants/ALT'][4120212:], 'GT' : dat['calldata/GT'][4120212:]}
 
-posrefalt = np.array([position, reference, alternate[0]])
 
-seen = [0]
-duplicates = [0]
 
-#find duplicate positions
-for i in position:
-    if i in seen:
-        duplicates.append(i)
+dup = {}
+seen = {}
+
+for x in range(chromX['POS'].size):
     
-    seen.append(i)
-
-
-#delete multiple-base-pair references
-for i in posrefalt:
-    for x in range(posrefalt.size):
-        if len(posrefalt[1][x]) != 1 or len(posrefalt[2][x]) != 1:
-            #delte the column
+    pos = chromX['POS'][x]
+    
+    if pos in seen.keys():
+    
+        dup[pos] = [chromX['REF'][x], chromX['ALT'][x]]
+    
+    else:
+    
+        seen[pos] = 1
         
-
+homo = {} 
+hetero10 = {} 
+hetero01 = {}
+     
+for x in range(chromX['POS'].size):
+    
+    gt = chromX['GT'][x][0]
+    
+    if gt[0] == gt[1]:
         
+        homo[chromX['POS'][x]] = gt
         
+    elif gt[0] == 1:
+        
+        hetero10[chromX['POS'][x]] = gt
+        
+    else:
+        hetero01[chromX['POS'][x]] = gt
         
