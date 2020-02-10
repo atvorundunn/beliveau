@@ -13,8 +13,9 @@ import numpy as np
 dat = allel.read_vcf('/Users/tvorua/Downloads/hg38.hybrid.vcf')
 
 
-chromX = {'POS' : dat['variants/POS'][4120212:], 'REF' : dat['variants/REF'][4120212:],
-          'ALT' : dat['variants/ALT'][4120212:], 'GT' : dat['calldata/GT'][4120212:]}
+chromX = {'POS' : dat['variants/POS'], 'REF' : dat['variants/REF'],
+          'ALT' : dat['variants/ALT'], 'GT' : dat['calldata/GT'], 'CHROM' : dat['variants/CHROM']}
+#truncate data
 
 
 
@@ -27,11 +28,19 @@ for x in range(chromX['POS'].size):
     
     if pos in seen.keys():
     
-        dup[pos] = [chromX['REF'][x], chromX['ALT'][x]]
+        dup[pos] = [chromX['REF'][x], chromX['CHROM'][x] , seen[pos][0], seen[pos][1]]
+        #find duplicates
+        
+        if chromX['CHROM'][x] == seen[pos][1]:
+            print(pos)
+            print(chromX['CHROM'][x])
+            print(seen[pos][1])
+            
+            #there are no duplicate positions on the same chromosome!!!
     
     else:
     
-        seen[pos] = 1
+        seen[pos] = [chromX['REF'][x], chromX['CHROM'][x]]
         
 homo = {} 
 hetero10 = {} 
@@ -44,11 +53,16 @@ for x in range(chromX['POS'].size):
     if gt[0] == gt[1]:
         
         homo[chromX['POS'][x]] = gt
+        #segregate homozygous alleles
         
     elif gt[0] == 1:
         
         hetero10[chromX['POS'][x]] = gt
+        #segregate 1 | 0 heterzygous alleles
         
     else:
         hetero01[chromX['POS'][x]] = gt
+        #segregate 0 | 1 heterozygous alleles
         
+        
+#TODO: eliminate long references and alternates
