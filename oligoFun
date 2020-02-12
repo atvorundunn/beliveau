@@ -7,7 +7,6 @@ Created on Wed Jan 22 10:17:22 2020
 """
 
 import allel
-import numpy as np
 
 
 dat = allel.read_vcf('/Users/tvorua/Downloads/hg38.hybrid.vcf')
@@ -43,7 +42,7 @@ for x in range(chromX['POS'].size):
         seen[pos] = [chromX['REF'][x], chromX['CHROM'][x]]
         
 homo = {} 
-hetero10 = {} 
+#hetero10 = {} 
 hetero01 = {}
      
 for x in range(chromX['POS'].size):
@@ -55,14 +54,27 @@ for x in range(chromX['POS'].size):
         homo[chromX['POS'][x]] = gt
         #segregate homozygous alleles
         
-    elif gt[0] == 1:
+    #elif gt[0] == 1:
         
-        hetero10[chromX['POS'][x]] = gt
+     #   hetero10[chromX['POS'][x]] = gt
         #segregate 1 | 0 heterzygous alleles
         
     else:
         hetero01[chromX['POS'][x]] = gt
         #segregate 0 | 1 heterozygous alleles
+        
+
+tight = []
+loose = []
+
+for x in range(chromX['POS'].size - 1):
+    
+    dens = chromX['POS'][x + 1] - chromX['POS'][x]
+    
+    if dens <= 10 and chromX['POS'][x] in hetero01.keys():
+        tight.append(chromX['POS'][x])
+    if dens >= 100 and chromX['POS'][x] in hetero01.keys():
+        loose.append(chromX['POS'][x])
         
         
 #TODO: eliminate long references and alternates
