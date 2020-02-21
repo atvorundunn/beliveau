@@ -7,13 +7,17 @@ Created on Wed Jan 22 10:17:22 2020
 """
 
 import allel
+import math
+
+filename = '/Users/tvorua/Downloads/hg38.hybrid.vcf'
 
 
-dat = allel.read_vcf('/Users/tvorua/Downloads/hg38.hybrid.vcf')
+dat = allel.read_vcf(filename)
 
 
-chromX = {'POS' : dat['variants/POS'], 'REF' : dat['variants/REF'],
-          'ALT' : dat['variants/ALT'], 'GT' : dat['calldata/GT'], 'CHROM' : dat['variants/CHROM']}
+chromX = {'POS' : dat['variants/POS'][4120212:], 'REF' : dat['variants/REF'][4120212:],
+          'ALT' : dat['variants/ALT'][4120212:], 'GT' : dat['calldata/GT'][4120212:], 
+          'CHROM' : dat['variants/CHROM'][4120212:]}
 #truncate data
 
 
@@ -41,9 +45,12 @@ for x in range(chromX['POS'].size):
     
         seen[pos] = [chromX['REF'][x], chromX['CHROM'][x]]
         
+
+
+#seperate Homozygous and hetrozygous
+
 homo = {} 
-#hetero10 = {} 
-hetero01 = {}
+hetero = {}
      
 for x in range(chromX['POS'].size):
     
@@ -53,28 +60,62 @@ for x in range(chromX['POS'].size):
         
         homo[chromX['POS'][x]] = gt
         #segregate homozygous alleles
-        
-    #elif gt[0] == 1:
-        
-     #   hetero10[chromX['POS'][x]] = gt
-        #segregate 1 | 0 heterzygous alleles
-        
+
     else:
-        hetero01[chromX['POS'][x]] = gt
-        #segregate 0 | 1 heterozygous alleles
+        hetero[chromX['POS'][x]] = gt
+        #segregate heterozygous alleles
         
+        
+        
+length = chromX['POS'].size - 1
+        
+
+
+
+#Find avg and standard deviation
+
+
+distSum = 0
+count = 0
+
+for x in range(length):
+    
+    dist = chromX['POS'][x+1] - chromX['POS'][x]
+    distSum = distSum + dist
+    count = count + 1
+        
+    
+avg = distSum/count
+
+sdSum = 0
+
+for x in range(length):
+    val = dist = chromX['POS'][x+1] - chromX['POS'][x]
+    sdInd = (val - avg)*(val - avg)
+    sdSum = sdSum + sdInd
+    
+sd = math.sqrt(sdSum/length)
+
+
+
+
+
+#Group loci by density
+
 
 tight = []
 loose = []
 
-for x in range(chromX['POS'].size - 1):
+for x in range(length):
     
     dens = chromX['POS'][x + 1] - chromX['POS'][x]
     
-    if dens <= 10 and chromX['POS'][x] in hetero01.keys():
-        tight.append(chromX['POS'][x])
-    if dens >= 100 and chromX['POS'][x] in hetero01.keys():
-        loose.append(chromX['POS'][x])
+    if dens <= avg / 2 and chromX['POS'][x] in hetero.keys():
         
+        tight.append(chromX['POS'][x])
+        
+    if dens >= avg * 2 and chromX['POS'][x] in hetero.keys():
+        
+        loose.append(chromX['POS'][x])
         
 #TODO: eliminate long references and alternates
