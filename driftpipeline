@@ -44,7 +44,7 @@ for i in range(0, 6000, 1):
 for key in pointdict:
     fo = np.fft.fft(pointdict.get(key))
     
-    
+#Peaks are not distinct between noise and true signal :( No further attempts shall be made.    
     
 
 
